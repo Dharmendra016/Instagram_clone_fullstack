@@ -2,7 +2,7 @@ import express, { urlencoded } from "express"
 import cookieParser from "cookie-parser";
 import cors from "cors"
 import dotenv from "dotenv";
-import dbconnect from "./utils/dbConnect.js";
+import dbconnect from "./utils/dbConnect.js"
 dotenv.config();
 
 const app = express(); 
