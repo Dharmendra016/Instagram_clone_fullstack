@@ -125,6 +125,15 @@ export const getProfile = async (req , res) => {
 
 export const exitProfile = async (req ,res) => {
     try {
+        const UserId = req.userId; 
+        const {bio , gender} = req.body ; 
+        const profilePic = req.file; 
+
+        let cloudinaryResponse ; 
+
+        if( profilePic ){
+            
+        }
         
     } catch (error) {
         console.log(error.message);
