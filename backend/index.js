@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors"
 import dotenv from "dotenv";
 import dbconnect from "./utils/dbConnect.js"
+import userRoute from "./routes/user.route.js";
 dotenv.config();
 
 const app = express(); 
@@ -20,6 +21,8 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
+//api routes 
+app.use("/api/v1/user" , userRoute)
 
 app.get("/" , (req, res) => {
     res.send("Hello world");

@@ -2,12 +2,14 @@ import {user} from "../models/user.model.js";
 import dotenv from "dotenv"; 
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "cloudinary";
+import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken";
 dotenv.config();
 
 export const register = async(req,res) =>{
     try {
         const {username , email , password} = req.body ; 
-
+        console.log(username , email , password);
         if( !username || !email || !password){
             return res.status(400).json({
                 message:"Something is missing, please check again!",
@@ -15,7 +17,7 @@ export const register = async(req,res) =>{
             })
         }
         //checking if there was already accound of that email.
-        const User = await userModel.user.findOne({email});
+        const User = await user.findOne({email});
         if(User){
             return res.status(401).json({
                 message:"Try different email",
@@ -26,10 +28,11 @@ export const register = async(req,res) =>{
         //creating new account 
             //before creating hassing the password
         const hashedPassword = await bcrypt.hash(password , 10)
+        console.log(hashedPassword);
         await user.create({
             username , 
             email , 
-            passowrd:hashedPassword,
+            password:hashedPassword,
         })
 
         return res.status(200).json({
@@ -76,14 +79,14 @@ export const login = async (req, res) => {
             _id:User._id,
             username:User.username , 
             email:User.email,
-            profilePic:User.profilePic , 
+            profilePic:User.profilePicture , 
             bio:User.bio, 
             followers:User.followers,
             following:User.following, 
             posts:User.posts,
         }
 
-        const token = await jwt.sign({UserId:User_id} , process.env.SECRET_KEY , {expireIn:"1d"}); 
+        const token = await jwt.sign({UserId:User._id} , process.env.SECRET_KEY , {expiresIn: "1d"}); 
         return res.cookie ('token' , token , {httpOnly:true, sameSite:"strict", maxAge:1*24*60*60*1000}).json({
             message:`Welcome back ${User.username}`,
             success:true,
@@ -125,16 +128,16 @@ export const getProfile = async (req , res) => {
 }
 
 
-export const exitProfile = async (req ,res) => {
+export const editProfile = async (req ,res) => {
     try {
         const UserId = req.userId; 
         const {bio , gender} = req.body ; 
-        const profilePic = req.file; 
+        const profilePicture = req.file; 
 
         let cloudinaryResponse ; 
 
-        if( profilePic ){
-            const fileUri = getDataUri(profilePic); 
+        if( profilePicture ){
+            const fileUri = getDataUri(profilePicture); 
             cloudinaryResponse = await cloudinary.uplodaer.upload(fileUri) ; 
         }
         const User = await user.findById(UserId) ; 
@@ -147,7 +150,7 @@ export const exitProfile = async (req ,res) => {
 
         if( bio) User.bio = bio; 
         if (gender) User.gender = gender ; 
-        if( profilePic ) User.profilePic = cloudinaryResponse.secure_url ; 
+        if( profilePicture ) User.profilePicture = cloudinaryResponse.secure_url ; 
 
         await User.save() ;
 
