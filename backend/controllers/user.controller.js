@@ -1,5 +1,7 @@
 import {user} from "../models/user.model.js";
 import dotenv from "dotenv"; 
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "cloudinary";
 dotenv.config();
 
 export const register = async(req,res) =>{
@@ -132,10 +134,110 @@ export const exitProfile = async (req ,res) => {
         let cloudinaryResponse ; 
 
         if( profilePic ){
-            
+            const fileUri = getDataUri(profilePic); 
+            cloudinaryResponse = await cloudinary.uplodaer.upload(fileUri) ; 
         }
+        const User = await user.findById(UserId) ; 
+        if( !User ){
+            return res.status(404).json({
+                message:"user not found",
+                success:false,
+            })
+        }
+
+        if( bio) User.bio = bio; 
+        if (gender) User.gender = gender ; 
+        if( profilePic ) User.profilePic = cloudinaryResponse.secure_url ; 
+
+        await User.save() ;
+
+        return res.status(200).json({
+            message:"profile updated",
+            success:true, 
+            User,
+        })
         
     } catch (error) {
         console.log(error.message);
     }
+}
+
+
+export const getSuggestedUsers = async (req ,res) => {
+
+    try {
+            //find will find all user that is not equal to the req.id ,    select will give all the properties except passowrd as we "-" it . 
+        const SuggestedUsers = await user.find({_id:{$ne:req.id}}).select("-password");
+
+        if( !SuggestedUsers) {
+            return res.status(400).json({
+                message:"Currently do not have any users" , 
+                success:false, 
+            })
+        }
+
+        return res.status(200).json({
+            message:"Successfully found the users", 
+            success:true, 
+            users:SuggestedUsers,
+        })
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+export const followOrUnfollow = async ( req, res ) => {
+
+    try {
+        
+        const following = req.id ; // follow garne wala
+        const follower = req.params.id; // jasko ma garne ho tesko 
+
+        if( following === follower ){
+            return res.status(400).json({
+                message:"Can't follow/unfollow yourself ",
+                success:false,
+            })
+        }
+
+        const targetUser = await user.findById({follower}); 
+        const User = await user.findById({following}); 
+
+        if( !targetUser || !User){
+            return res.status(400).json({
+                message:"User not found ",
+                success:false,
+            })
+        }
+
+        const isFollowing = user.following.includes(follower) ; 
+
+        if( isFollowing ){
+
+            //unfollow logic 
+            await Promise.all([
+                user.updateOne({_id:following} , {$pull:{following:follower}}),
+                user.updateOne({_id:follower} , {$pull:{follower:following}}) , 
+            ])
+            return res.status(200).json({
+                message:"Unfollowed successfully",
+                success:true,
+            })
+        }else{
+            //yakai choti 2 db call hunxa vana .  use promise.all([])
+            await Promise.all([
+                user.updateOne({_id:following} , {$push:{following:follower}}),
+                user.updateOne({_id:follower} , {$push:{follower:following}}) , 
+            ])
+            return res.status(200).json({
+                message:"followed successfully",
+                success:true,
+            })
+        }
+       
+
+    } catch (error) {
+        console.log(error.message);
+    }
+
 }
