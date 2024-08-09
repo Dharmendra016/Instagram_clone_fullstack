@@ -115,7 +115,7 @@ export const logout = async (req , res)=>{
 export const getProfile = async (req , res) => {
     try {
         const userId = req.params.id; 
-        let User =  await user.findById(userId); 
+        let User =  await user.findById(userId).select("-password"); 
 
         return res.status(200).json({
             User, 
@@ -173,7 +173,7 @@ export const getSuggestedUsers = async (req ,res) => {
 
     try {
             //find will find all user that is not equal to the req.id ,    select will give all the properties except passowrd as we "-" it . 
-        const SuggestedUsers = await user.find({_id:{$ne:req.id}}).select("-password");
+        const SuggestedUsers = await user.find({_id:{$ne:req.userId}}).select("-password");
 
         if( !SuggestedUsers) {
             return res.status(400).json({
@@ -196,7 +196,7 @@ export const followOrUnfollow = async ( req, res ) => {
 
     try {
         
-        const following = req.id ; // follow garne wala
+        const following = req.userId ; // follow garne wala
         const follower = req.params.id; // jasko ma garne ho tesko 
 
         if( following === follower ){
@@ -206,8 +206,8 @@ export const followOrUnfollow = async ( req, res ) => {
             })
         }
 
-        const targetUser = await user.findById({follower}); 
-        const User = await user.findById({following}); 
+        const targetUser = await user.findById(follower); 
+        const User = await user.findById(following); 
 
         if( !targetUser || !User){
             return res.status(400).json({
@@ -216,7 +216,7 @@ export const followOrUnfollow = async ( req, res ) => {
             })
         }
 
-        const isFollowing = user.following.includes(follower) ; 
+        const isFollowing = User.following.includes(follower) ; 
 
         if( isFollowing ){
 
@@ -233,7 +233,7 @@ export const followOrUnfollow = async ( req, res ) => {
             //yakai choti 2 db call hunxa vana .  use promise.all([])
             await Promise.all([
                 user.updateOne({_id:following} , {$push:{following:follower}}),
-                user.updateOne({_id:follower} , {$push:{follower:following}}) , 
+                user.updateOne({_id:follower} , {$push:{followers:following}}) , 
             ])
             return res.status(200).json({
                 message:"followed successfully",

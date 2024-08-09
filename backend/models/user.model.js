@@ -27,13 +27,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["male", "female"]
     },
-    followers: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+    followers:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'user'
     }],
-    following: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+    following:[{
+        type:mongoose.Schema.Types.ObjectId, 
+        ref:'user'
     }],
     posts: [{
         type: mongoose.Schema.Types.ObjectId,
