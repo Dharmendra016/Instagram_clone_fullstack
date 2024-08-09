@@ -4,6 +4,7 @@ import cors from "cors"
 import dotenv from "dotenv";
 import dbconnect from "./utils/dbConnect.js"
 import userRoute from "./routes/user.route.js";
+import cloudinaryConnect from "./utils/cloudinary.js";
 dotenv.config();
 
 const app = express(); 
@@ -12,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 //middlewares
 app.use(express.json()); 
-app.use(urlencoded({extended:true}))
+app.use(urlencoded({extended:false}))
 app.use(cookieParser());
 
 const corsOptions = {
@@ -20,6 +21,7 @@ const corsOptions = {
     credentials:true
 }
 app.use(cors(corsOptions))
+cloudinaryConnect();
 
 //api routes 
 app.use("/api/v1/user" , userRoute)

@@ -138,7 +138,10 @@ export const editProfile = async (req ,res) => {
 
         if( profilePicture ){
             const fileUri = getDataUri(profilePicture); 
-            cloudinaryResponse = await cloudinary.uplodaer.upload(fileUri) ; 
+            cloudinaryResponse = await cloudinary.uploader.upload(fileUri)
+            .catch((error) => {
+                console.log(error);
+            }); 
         }
         const User = await user.findById(UserId) ; 
         if( !User ){
