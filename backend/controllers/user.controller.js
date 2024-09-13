@@ -153,7 +153,7 @@ export const editProfile = async (req ,res) => {
 
         if( bio) User.bio = bio; 
         if (gender) User.gender = gender ; 
-        if( profilePicture ) User.profilePicture = cloudinaryResponse.secure_url ; 
+        if( profilePicture ) User.profilePic = cloudinaryResponse.secure_url ; 
 
         await User.save() ;
 
