@@ -1,6 +1,6 @@
-import {post} from "../models/post.model"
-import { user } from "../models/user.model";
-import {comment} from "../models/comment.model"
+import {post} from "../models/post.model.js"
+import { user } from "../models/user.model.js";
+import {comment} from "../models/comment.model.js"
 import sharp from "sharp"
 
 export const addNewPost = async (req , res) => {

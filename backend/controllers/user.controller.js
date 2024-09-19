@@ -4,6 +4,7 @@ import getDataUri from "../utils/datauri.js";
 import cloudinary from "cloudinary";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
+import { post } from "../models/post.model.js";
 dotenv.config();
 
 export const register = async(req,res) =>{
@@ -75,6 +76,15 @@ export const login = async (req, res) => {
             });
         }
 
+        const populatedPost = await Promise.all(
+            User.posts.map(async(postId) => {
+                const Post = await post.findById(postId);
+                if( Post.author.equals(user._id)){
+                    return Post;
+                }
+                return null ;
+            })
+        )
         const UserData = {
             _id:User._id,
             username:User.username , 
@@ -83,7 +93,7 @@ export const login = async (req, res) => {
             bio:User.bio, 
             followers:User.followers,
             following:User.following, 
-            posts:User.posts,
+            posts:populatedPost,
         }
 
         const token = await jwt.sign({UserId:User._id} , process.env.SECRET_KEY , {expiresIn: "1d"}); 
