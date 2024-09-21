@@ -2,12 +2,15 @@ import {post} from "../models/post.model.js"
 import { user } from "../models/user.model.js";
 import {comment} from "../models/comment.model.js"
 import sharp from "sharp"
+import cloudinary from "cloudinary"
 
 export const addNewPost = async (req , res) => {
     try {
-        const { caption , image } = req.body; 
-        const authorId = req.id;
+        const { caption } = req.body; 
+        const image = req.file;
+        const authorId = req.userId;
 
+        console.log(caption , image , authorId);
         if( !image){
             return res.status(401).json({
                 message:"image required",
@@ -20,15 +23,16 @@ export const addNewPost = async (req , res) => {
         .toBuffer();
 
 
-        const fileUri = `data:image/jepg;base64,${optimizedImage.toString('base64')}`
+        const fileUri = `data:image/jpeg;base64,${optimizedImage.toString('base64')}`;
         const cloudResponse = await cloudinary.uploader.upload(fileUri);
+
         const Post = await post.create({
             caption, 
             image:cloudResponse.secure_url,
             author:authorId, 
         })
 
-        const User =await user.findById({authorId});
+        const User =await user.findById(authorId);
 
         if( !User ){
             return res.status(402).json({
@@ -36,8 +40,8 @@ export const addNewPost = async (req , res) => {
             })
         }
 
-        User.post.push(post._id);
-        await User.save
+        User.posts.push(Post._id);
+        await User.save();
 
         await Post.populate({path:'author' , select:'-password'});
 
@@ -79,7 +83,7 @@ export const getAllPost = async (req , res )=>{
 export const getUserPosts =  async (req , res) => {
     try {
         
-        const authorId = req.id; 
+        const authorId = req.userId; 
         const Posts = await post.find({author:authorId}).sort({createdAt:-1}).populate({
             path:'author',
             select:'username, profilePic',
@@ -106,7 +110,7 @@ export const getUserPosts =  async (req , res) => {
 export const likePost = async (req, res) => {
 
     try {
-        const liker = req.id; 
+        const liker = req.userId; 
         const postId = req.params.id;
         const Post = await post.findById(postId); 
 
@@ -135,7 +139,7 @@ export const likePost = async (req, res) => {
 export const disLikePost = async (req, res) => {
 
     try {
-        const disLiker = req.id; 
+        const disLiker = req.userId; 
         const postId = req.params.id;
         const Post = await post.findById(postId); 
 
@@ -167,7 +171,7 @@ export const addCommnet = async(req,res) => {
         
         const {text} = req.body; 
         const postId = req.params.id; 
-        const authorId = req.id; 
+        const authorId = req.userId; 
         
         const Post = await post.findById(postId) ; 
 
@@ -239,7 +243,7 @@ export const deletePost = async (req, res) => {
 
     try {
         const postId = req.params.id;
-        const authorId = req.id; 
+        const authorId = req.userId; 
 
         const Post = await post.findById(postId) ; 
 
@@ -282,7 +286,7 @@ export const bookmarkPost = async (req, res) => {
     try {
         
         const postId = req.params.id; 
-        const authorId = req.id ;
+        const authorId = req.userId ;
 
         const Post = await post.findById(postId);
         if(!Post ){
