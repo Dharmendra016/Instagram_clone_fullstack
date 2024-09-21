@@ -6,28 +6,32 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
+import { useDispatch } from 'react-redux'
+import { setAuthUser } from '@/redux/authSlice'
 
-const Signup = () => {
+
+const Login = () => {
 
     const [input , setInput] = useState({
-        username:"",
         email:"",
         password:""
     })
 
     const [loading , setLoading] = useState(false);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
     const changeEventHandler = (e) => {
         setInput({...input , [e.target.name]:e.target.value});
     }
 
-    const navigate = useNavigate();
-    const signupHandeler = async (e) => {
+    const loginHandeler = async (e) => {
         e.preventDefault();
         try {
             setLoading(true)
             console.log(input);
 
-            const res = await axios.post('http://localhost:8000/api/v1/user/register',input , {
+            const res = await axios.post('http://localhost:8000/api/v1/user/login',input , {
                 headers:{
                     'Content-Type':'application/json',
                 },
@@ -35,18 +39,18 @@ const Signup = () => {
             })
 
             if(res.data.success){
+                // console.log("name",res.data.UserData);
+                dispatch(setAuthUser(res.data.UserData));
+                navigate('/');
                 toast.success(res.data.message);
                 setInput({
-                    username:"",
                     email:"",
                     password:""
                 })
             }
-            navigate("/login")
-
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message)
+            toast.error(error.response.data.message);
         }finally{
             setLoading(false);
         }
@@ -55,20 +59,10 @@ const Signup = () => {
   return (
     <div className='flex items-center w-screen h-screen justify-center'>
 
-        <form onSubmit={signupHandeler} className='shadow-lg flex-col gap-5 p-8 flex '>
+        <form onSubmit={loginHandeler} className='shadow-lg flex-col gap-5 p-8 flex '>
             <div className='my-4'>
                 <h1 className='text-center font-bold text-xl'>LOGO</h1>
-                <p className='text-center text-sm'>Signup to see photos and videos from your friends</p>
-            </div>
-            <div>
-                <Label className="py-2 font-medium">Username</Label>
-                <Input
-                type="text"
-                name='username'
-                value={input.username}
-                onChange={changeEventHandler}
-                className="focus-visible:ring-transparent"
-                />
+                <p className='text-center text-sm'>Login to see photos and videos from your friends</p>
             </div>
             <div>
                 <Label className="py-2 font-medium">Email</Label>
@@ -92,13 +86,14 @@ const Signup = () => {
             </div>
 
             {
-              loading? ( <Button> <Loader2 className='w-2 h-2 animate-spin '></Loader2></Button>):(<Button className="my-3" type="submit"> Signup </Button>)
+              loading? ( <Button> <Loader2 className='w-2 h-2 animate-spin '></Loader2></Button>):(<Button className="my-3" type="submit"> Login </Button>)
             }
-            <span className='text-center'>Already have an account? <Link to="/login" className='text-blue-400'>Login</Link></span>
+            
+            <span className='text-center'>Create an account? <Link to="/signup" className='text-blue-400'>Singup</Link></span>
         </form>
 
     </div>
   )
 }
 
-export default Signup
+export default Login
