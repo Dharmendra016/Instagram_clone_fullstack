@@ -88,12 +88,12 @@ export const login = async (req, res) => {
         const UserData = {
             _id:User._id,
             username:User.username , 
-            email:User.email,
-            profilePic:User.profilePicture , 
+            email:User.email, 
             bio:User.bio, 
             followers:User.followers,
             following:User.following, 
             posts:populatedPost,
+            profilePic:User.profilePic,
         }
 
         const token = await jwt.sign({UserId:User._id} , process.env.SECRET_KEY , {expiresIn: "1d"}); 

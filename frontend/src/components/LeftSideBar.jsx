@@ -2,10 +2,11 @@ import { setAuthUser } from '@/redux/authSlice'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import axios from 'axios'
 import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import CreatePost from './CreatePost'
 
 const LeftSideBar = () => {
     const navigate = useNavigate();
@@ -26,8 +27,13 @@ const LeftSideBar = () => {
         }
     }
 
+    const [open , setOpen] = useState(false);
     const sideItemhandler = async (type) => {
-        if( type === 'Logout') logoutHandeler() ;
+        if( type === 'Logout') {
+            logoutHandeler()
+        }else if(type === "Create"){
+            setOpen(true);
+        };
 
     }
 
@@ -64,8 +70,9 @@ const LeftSideBar = () => {
                     })
                     }
                 </div>
-               
             </div>
+            <CreatePost open={open} 
+            setOpen = {setOpen}/>
         </div>
     )
 }
