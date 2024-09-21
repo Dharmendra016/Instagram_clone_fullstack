@@ -1,35 +1,22 @@
+import { setAuthUser } from '@/redux/authSlice'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import axios from 'axios'
 import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
-const sidebarItems = [
-    { icon: <Home />, text: "Home", },
-    { icon: <Search />, text: "Search", },
-    { icon: <MessageCircle />, text: "Messages", },
-    { icon: <Heart />, text: "Notification", },
-    { icon: <TrendingUp />, text: "Explore", },
-    { icon: <PlusSquare />, text: "Create", },
-    {
-        icon: (
-            <Avatar className='w-6 h-6 rounded-full'>
-                <AvatarImage className='rounded-full' src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-        ), text: "Profile"
-    },
-    { icon: <LogOut />, text: "Logout", },
-
-]
-
 const LeftSideBar = () => {
     const navigate = useNavigate();
+
+    const {user} = useSelector(store => store.auth) ; 
+    const dispatch = useDispatch();
     const logoutHandeler = async () => {
         try {
             const res = await axios.get("http://localhost:8000/api/v1/user/logout" , {withCredentials:true})
             if( res.data.success ){
+                dispatch(setAuthUser(null));
                 navigate("/login");
                 toast.success(res.data.message);
             }
@@ -43,6 +30,26 @@ const LeftSideBar = () => {
         if( type === 'Logout') logoutHandeler() ;
 
     }
+
+    const sidebarItems = [
+        { icon: <Home />, text: "Home", },
+        { icon: <Search />, text: "Search", },
+        { icon: <MessageCircle />, text: "Messages", },
+        { icon: <Heart />, text: "Notification", },
+        { icon: <TrendingUp />, text: "Explore", },
+        { icon: <PlusSquare />, text: "Create", },
+        {
+            icon: (
+                <Avatar className='w-6 h-6 rounded-full'>
+                    <AvatarImage className='rounded-full' src= {user?.profilePic} alt="@shadcn" />
+                    <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+            ), text: "Profile"
+        },
+        { icon: <LogOut />, text: "Logout", },
+    
+    ]
+
     return (
         <div className='fixed top-0  z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen'>
             <div className='flex flex-col'>
