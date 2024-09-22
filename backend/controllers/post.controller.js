@@ -47,7 +47,7 @@ export const addNewPost = async (req , res) => {
 
         return res.status(201).json({
             message:"new post added",
-            post,
+            posts:Post,
             success:true,
         })
 
@@ -71,7 +71,7 @@ export const getAllPost = async (req , res )=>{
     })
 
     return res.status(200).json({
-        Post , 
+        posts:Post , 
         success:true,
     })
 
@@ -121,7 +121,7 @@ export const likePost = async (req, res) => {
         }
 
         await post.updateOne({$addToSet:{likes:liker}});
-        await post.save(); 
+        await Post.save(); 
 
         //implement socket io for real time notification 
 
@@ -132,6 +132,7 @@ export const likePost = async (req, res) => {
 
     } catch (error) {
         console.log(error);
+
     }
 
 }
@@ -149,8 +150,8 @@ export const disLikePost = async (req, res) => {
             })
         }
 
-        await post.updateOne({$pull:{likes:liker}});
-        await post.save(); 
+        await post.updateOne({$pull:{likes:disLiker}});
+        await Post.save(); 
 
         //implement socket io for real time notification 
 
@@ -254,17 +255,16 @@ export const deletePost = async (req, res) => {
 
         //check if the auther is the post author
 
-        if( Post.author.toString() !== authorId ) {
+        if (Post.author.toString() !== authorId) {
             return res.status(401).json({
-                message:"You are the wrong the user",
-                success:false,
-            })
+                message: "Unauthorized",
+                success: false,
+            });
         }
+        await post.findByIdAndDelete(postId);
 
-        await post.findOneAndDelete({postId});
-
-        let User = await user.findById({authorId})
-        User.posts = User.posts.fileter(id =>id.toString()!==postId);
+        let User = await user.findById(authorId)
+        User.posts = User.posts.filter(id =>id.toString()!==postId);
         await User.save();
 
         //delete all comments 

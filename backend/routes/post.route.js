@@ -12,7 +12,7 @@ router.get('/:id/like',isAuthenticated, likePost);
 router.get('/:id/dislike',isAuthenticated, disLikePost); 
 router.post('/:id/comment',isAuthenticated, addCommnet); 
 router.get('/:id/comment/all',isAuthenticated, getAllComments); 
-router.post('/delete/all',isAuthenticated, deletePost); 
+router.delete('/delete/:id',isAuthenticated, deletePost); 
 router.post('/:id/bookmark',isAuthenticated, bookmarkPost); 
 
 export default router ;
