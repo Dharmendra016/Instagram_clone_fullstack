@@ -10,7 +10,6 @@ export const addNewPost = async (req , res) => {
         const image = req.file;
         const authorId = req.userId;
 
-        console.log(caption , image , authorId);
         if( !image){
             return res.status(401).json({
                 message:"image required",
@@ -120,7 +119,7 @@ export const likePost = async (req, res) => {
             })
         }
 
-        await post.updateOne({$addToSet:{likes:liker}});
+        await Post.updateOne({$addToSet:{likes:liker}});
         await Post.save(); 
 
         //implement socket io for real time notification 
@@ -150,7 +149,7 @@ export const disLikePost = async (req, res) => {
             })
         }
 
-        await post.updateOne({$pull:{likes:disLiker}});
+        await Post.updateOne({$pull:{likes:disLiker}});
         await Post.save(); 
 
         //implement socket io for real time notification 
@@ -264,7 +263,7 @@ export const deletePost = async (req, res) => {
         await post.findByIdAndDelete(postId);
 
         let User = await user.findById(authorId)
-        User.posts = User.posts.filter(id =>id.toString()!==postId);
+        User.posts = User.posts.filter(id =>id.toString()!== postId);
         await User.save();
 
         //delete all comments 

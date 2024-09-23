@@ -20,6 +20,7 @@ const Post = ({ post }) => {
     const dispatch = useDispatch();
 
     const [liked, setLiked] = useState(post.likes.includes(user._id) || false)
+    const [postLike , setPostLike]  = useState(post.likes.length);
 
     const changeEventHandler = (e) => {
         const inputText = e.target.value;
@@ -47,22 +48,27 @@ const Post = ({ post }) => {
         }
     }
 
-    const likeOrDislikeHandler = async (postId) => {
-
+    const likeOrDislikeHandler = async () => {
         try {
-            const action = liked ? "dislike" : "liked";
-
-            const res = await axios.get(`http://localhost:8000/api/v1/post/${postId}/${action}`, { withCredentials: true })
-
+            const action = liked ? 'dislike' : 'like';
+            const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/${action}`, { withCredentials: true });
+            console.log(res.data);
             if (res.data.success) {
+                const updatedLikes = liked ? postLike - 1 : postLike + 1;
+                setPostLike(updatedLikes);
                 setLiked(!liked);
+
+                const updatedPostData = posts.map(p =>
+                    p._id === post._id ? {
+                        ...p,
+                        likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
+                    } : p
+                );
+                dispatch(setPosts(updatedPostData));
                 toast.success(res.data.message);
             }
-
-
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message)
         }
     }
 
@@ -107,7 +113,7 @@ const Post = ({ post }) => {
                 </div>
                 <Bookmark className='cursor-pointer hover:text-gray-600' />
             </div>
-            <span className='font-medium block mb-2'>{post.likes.length} likes</span>
+            <span className='font-medium block mb-2'>{postLike} likes</span>
             <p >
                 <span className='font-medium mr-2'>{post.author?.username}</span>
                 {post.caption}
