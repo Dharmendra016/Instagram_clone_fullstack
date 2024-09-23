@@ -189,20 +189,24 @@ export const addCommnet = async(req,res) => {
             })
         } 
 
-        const Comment = await comment.create({
-            text , 
-            author:authorId,
-            post:Post,
-        }).populate({
-            path:'author',
-            select:"username, profilePic",
-        })
+        let Comment = await comment.create({
+            text, 
+            author: authorId,
+            post: Post,
+        });
+        
+        // Now populate the fields after the comment has been created
+        Comment = await Comment.populate({
+            path: 'author',
+            select: 'username profilePic',
+        });
 
         Post.comments.push(Comment._id);
         await Post.save();
 
         return res.status(200).json({
-            success:ture,
+            success:true,
+            comment:Comment,
             message:"comment successfully Added",
         })
 

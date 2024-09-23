@@ -22,6 +22,8 @@ const Post = ({ post }) => {
     const [liked, setLiked] = useState(post.likes.includes(user._id) || false)
     const [postLike , setPostLike]  = useState(post.likes.length);
 
+    const [comment , setComment] = useState(post.comments)
+
     const changeEventHandler = (e) => {
         const inputText = e.target.value;
         if (inputText.trim()) {
@@ -72,6 +74,34 @@ const Post = ({ post }) => {
         }
     }
 
+
+    const commentHandler = async() =>{
+
+        try {
+
+            const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`,{text},{
+                headers:{
+                    'Content-Type':"application/json",
+                },
+                withCredentials:true,
+            })
+            if(res.data.success){
+                const updatedComment = [...comment , res.data.comment]
+                setComment(updatedComment);
+                const updatedPost = posts.map(p =>
+                    p._id === post._id ? { ...p, comments: updatedComment   }:p
+                )
+                dispatch(setPosts(updatedPost));
+                toast.success(res.data.message);
+            }
+            
+        } catch (error) {
+            console.log(error);
+            // toast.error(error.response.data.message);
+        }
+
+    }
+
     return (
         <div className='my- w-full max-w-sm mx-auto'>
             <div className='flex items-center justify-between'>
@@ -107,7 +137,11 @@ const Post = ({ post }) => {
 
             <div className='flex items-center justify-between my-2'>
                 <div className='flex items-center gap-4'>
-                    <FaRegHeart onClick={likeOrDislikeHandler} size={'24px'} className='cursor-pointer hover:text-gray-600' />
+                    
+                    {
+                        liked? ( <FaHeart onClick={likeOrDislikeHandler} size={'24px'} className='cursor-pointer text-red-600'/> ) : (  <FaRegHeart onClick={likeOrDislikeHandler} size={'24px'} className='cursor-pointer hover:text-gray-600' /> )
+                    }
+                    
                     <MessageCircle onClick={() => setOpen(true)} className='cursor-pointer hover:text-gray-600' />
                     <Send className='cursor-pointer hover:text-gray-600' />
                 </div>
@@ -118,8 +152,8 @@ const Post = ({ post }) => {
                 <span className='font-medium mr-2'>{post.author?.username}</span>
                 {post.caption}
             </p>
-            <span onClick={() => { setOpen(true) }} className='cursor-pointer text-sm text-gray-400'>View all {post.comments.length} comments</span>
-            <CommentDialog open={open} setOpen={setOpen} />
+            <span onClick={() => { setOpen(true) }} className='cursor-pointer text-sm text-gray-400'>View all {comment.length} comments</span>
+            <CommentDialog open={open} setOpen={setOpen} comment={comment} setComment={setComment} post={post}/>
             <div className='flex justify-between items-center'>
                 <input
                     type="text"
@@ -129,7 +163,7 @@ const Post = ({ post }) => {
                     className='outline-none text-sm w-full'
                 />
                 {
-                    text && <span className='text-[#38ADF8]'>Post</span>
+                    text && <span className='text-[#38ADF8] cursor-pointer' onClick={commentHandler} >Post</span>
                 }
 
             </div>
