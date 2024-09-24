@@ -93,6 +93,8 @@ const Post = ({ post }) => {
                 )
                 dispatch(setPosts(updatedPost));
                 toast.success(res.data.message);
+                setText("");
+
             }
             
         } catch (error) {
