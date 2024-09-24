@@ -36,6 +36,10 @@ const LeftSideBar = () => {
             logoutHandeler()
         }else if(type === "Create"){
             setOpen(true);
+        }else if( type === "Profile"){
+            navigate(`/profile/${user._id}`)
+        }else if( type === "Home"){
+            navigate('/')
         };
 
     }
