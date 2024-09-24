@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   user: null,
+  suggestedUser:[],
 };
 
 const authSlice = createSlice({
@@ -11,6 +12,9 @@ const authSlice = createSlice({
     setAuthUser: (state, action) => {
       state.user = action.payload;
     },
+    setSuggestedUser:(state, action) => {
+      state.suggestedUser = action.payload;
+    }
   },
 });
 

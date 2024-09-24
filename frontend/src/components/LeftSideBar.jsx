@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import CreatePost from './CreatePost'
+import { setPosts, setSelectedPost } from '@/redux/postSlice'
 
 const LeftSideBar = () => {
     const navigate = useNavigate();
@@ -18,6 +19,8 @@ const LeftSideBar = () => {
             const res = await axios.get("http://localhost:8000/api/v1/user/logout" , {withCredentials:true})
             if( res.data.success ){
                 dispatch(setAuthUser(null));
+                dispatch(setPosts([]))
+                dispatch(setSelectedPost(null));
                 navigate("/login");
                 toast.success(res.data.message);
             }
