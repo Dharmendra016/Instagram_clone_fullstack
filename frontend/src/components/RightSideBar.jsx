@@ -1,8 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import SuggestedUser from './SuggestedUser'
+import { setUserProfile } from '@/redux/authSlice'
 
 const RightSideBar = () => {
   const { user } = useSelector(store => store.auth)
@@ -16,13 +17,13 @@ const RightSideBar = () => {
           </Avatar>
         </Link>
         <div className='flex flex-col'>
-          <Link to={`/profile/${user._id}`}>
+          <Link to={`/profile/${user._id}`} >
             <h1 className='text-sm font-semibold'>{user?.username}</h1>
             <h1 className='text-sm font-thin text-gray-600'>{user?.bio || "Bio here..."}</h1>
           </Link>
         </div>
       </div>
-      <SuggestedUser/>
+      <SuggestedUser />
     </div>
   )
 }

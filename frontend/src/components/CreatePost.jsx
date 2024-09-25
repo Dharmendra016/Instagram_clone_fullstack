@@ -90,7 +90,7 @@ const CreatePost = ({ open, setOpen }) => {
         }
 
         <input onChange={fileChangeHandler} ref = {imageRef} type="file" className='hidden' />
-        <Button onClick={() => imageRef.current.click()} className="w-fit mx-auto bg-[#0095F6] hover:bg-[#45a3e2]">Select from computer</Button>
+        <Button onClick={() => imageRef?.current.click()} className="w-fit mx-auto bg-[#0095F6] hover:bg-[#45a3e2]">Select from computer</Button>
         {
           preview && (
             loading ? (<Button><Loader2 className='w-2 h-2 animate-spin '></Loader2></Button>):(<Button onClick={createPostHandler}>Post</Button>)

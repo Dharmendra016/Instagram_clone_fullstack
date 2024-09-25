@@ -54,7 +54,7 @@ const LeftSideBar = () => {
         {
             icon: (
                 <Avatar className='w-6 h-6 rounded-full'>
-                    <AvatarImage className='rounded-full' src= {user?.profilePic} alt="@shadcn" />
+                    <AvatarImage className='rounded-full h-full w-full' src= {user?.profilePic} alt="@shadcn" />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
             ), text: "Profile"

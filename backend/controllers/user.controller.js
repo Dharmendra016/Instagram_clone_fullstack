@@ -125,7 +125,7 @@ export const logout = async (req , res)=>{
 export const getProfile = async (req , res) => {
     try {
         const userId = req.params.id; 
-        let User =  await user.findById(userId).select("-password"); 
+        let User =  await user.findById(userId).populate({path:'posts',createdAt:-1}).populate('bookmark'); 
 
         return res.status(200).json({
             User, 
@@ -142,12 +142,14 @@ export const editProfile = async (req ,res) => {
     try {
         const UserId = req.userId; 
         const {bio , gender} = req.body ; 
-        const profilePicture = req.file; 
+        const profilePic = req.file; 
 
+        console.log(bio , gender , profilePic);
         let cloudinaryResponse ; 
 
-        if( profilePicture ){
-            const fileUri = getDataUri(profilePicture); 
+
+        if( profilePic ){
+            const fileUri = getDataUri(profilePic); 
             cloudinaryResponse = await cloudinary.uploader.upload(fileUri)
             .catch((error) => {
                 console.log(error);
@@ -163,14 +165,14 @@ export const editProfile = async (req ,res) => {
 
         if( bio) User.bio = bio; 
         if (gender) User.gender = gender ; 
-        if( profilePicture ) User.profilePic = cloudinaryResponse.secure_url ; 
+        if( profilePic ) User.profilePic = cloudinaryResponse.secure_url ; 
 
         await User.save() ;
 
         return res.status(200).json({
             message:"profile updated",
             success:true, 
-            User,
+            user:User,
         })
         
     } catch (error) {
