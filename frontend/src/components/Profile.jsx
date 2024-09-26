@@ -11,13 +11,14 @@ import { AtSign, Heart, MessageCircle } from 'lucide-react';
 export const Profile = () => {
   const params = useParams();
   const userId = params.id;
+  console.log(userId);
   useGetUserProfile(userId);
 
   const [activeTab , setActiveTab] = useState("posts"); 
   const { userProfile , user} = useSelector(store => store.auth);
 
 
-  const isLoggedInUserProfile =  user._id === userProfile._id ? true : false;
+  const isLoggedInUserProfile =  user?._id === userProfile?._id ? true : false;
   ;
 
   const isFollowing = user.following.some(followedUser => followedUser._id === userProfile._id);

@@ -7,9 +7,8 @@ import userRoute from "./routes/user.route.js";
 import cloudinaryConnect from "./utils/cloudinary.js";
 import postRoute from "./routes/post.route.js"
 import messageRoute from "./routes/message.route.js"
+import { app,httpServer} from "./socket/socket.js"
 dotenv.config();
-
-const app = express(); 
 
 const PORT = process.env.PORT || 3000;
 
@@ -38,6 +37,6 @@ app.get("/" , (req, res) => {
 //db connect 
 dbconnect();
 
-app.listen(PORT , ()=>{
+httpServer.listen(PORT , ()=>{
     console.log(`Server started at port no: ${PORT}`);
 })

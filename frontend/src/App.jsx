@@ -8,6 +8,8 @@ import {
 } from "react-router-dom";
 import { Profile } from "./components/Profile";
 import EditProfile from "./components/EditProfile";
+import ChatPage from "./components/ChatPage";
+import ChatWithUser from "./components/ChatWithUser";
 
 const browserRouter = createBrowserRouter([
   {
@@ -25,6 +27,10 @@ const browserRouter = createBrowserRouter([
       {
         path:"/account/edit",
         element:<EditProfile/>
+      },
+      {
+        path:"/chat",
+        element:<ChatPage/>,
       }
     ]
   },
