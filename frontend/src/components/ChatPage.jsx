@@ -1,7 +1,7 @@
 import { setSelectedUser } from '@/redux/authSlice';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { MessageCircle } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
@@ -9,6 +9,7 @@ import { Input } from './ui/input';
 import Messages from './Messages';
 import axios from 'axios';
 import { setMessages } from '@/redux/chatSlice';
+import { toast } from 'sonner';
 
 const ChatPage = () => {
     const { user, suggestedUser, selectedUser } = useSelector(store => store.auth);
@@ -39,14 +40,22 @@ const ChatPage = () => {
             })
 
             if( res.data.success){
+                console.log(res.data);
                 dispatch(setMessages([...messages , res.data.newMessage]))
+
             }
 
         } catch (error) {
             console.log(error);
-            
+            toast.error(error.response.data.message);
         }
     }
+
+    useEffect(()=>{
+        return () =>{
+            dispatch(setSelectedUser(null));
+        }
+    },[])
 
 
     return (

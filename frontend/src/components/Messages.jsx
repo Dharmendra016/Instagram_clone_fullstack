@@ -7,10 +7,10 @@ const Messages = ({ selectedUser }) => {
         <div className='flex-1 p-4'>
             <div className='flex flex-col gap-3'>
                {
-                [1,2,3,4].map((message)=>{
+                messages?.map((msg)=>{
                     return <div className={`flex`}>
                         <div>
-                            {messages}
+                            {msg.message}
                         </div>
                     </div>
                 })
