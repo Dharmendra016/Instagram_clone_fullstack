@@ -9,7 +9,12 @@ import {
 import { Profile } from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import ChatPage from "./components/ChatPage";
-import ChatWithUser from "./components/ChatWithUser";
+// import ChatWithUser from "./components/ChatWithUser";
+import {io} from "socket.io-client"
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setSocket } from "./redux/socketSlice";
+import { setOnlineUsers } from "./redux/chatSlice";
 
 const browserRouter = createBrowserRouter([
   {
@@ -45,6 +50,35 @@ const browserRouter = createBrowserRouter([
 ])
 
 export default function App() {
+  const dispatch = useDispatch();
+  const {user} = useSelector(store => store.auth);
+  useEffect(() => {
+    if(user){
+      const socketio = io('http://localhost:8000' , {
+        query:{
+          userId:user?._id
+        },
+        transports:['websocket']
+      });
+      dispatch(setSocket(socketio));
+
+      socketio.on('getOnlineUser' , (onlineUser) => {
+        dispatch(setOnlineUsers(onlineUser));
+      })
+
+      return () => {
+        socketio.close();
+        dispatch(setSocket(null));
+      }
+
+    }else{
+      socketio.close();
+      dispatch(setSocket(null));
+    }
+
+
+  },[user, dispatch]);
+
   return (
     <div>
       <RouterProvider router={browserRouter}/>
