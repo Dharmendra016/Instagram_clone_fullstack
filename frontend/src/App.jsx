@@ -52,6 +52,7 @@ const browserRouter = createBrowserRouter([
 export default function App() {
   const dispatch = useDispatch();
   const {user} = useSelector(store => store.auth);
+  const {socket} = useSelector(store => store.socketio)
   useEffect(() => {
     if(user){
       const socketio = io('http://localhost:8000' , {
@@ -62,7 +63,7 @@ export default function App() {
       });
       dispatch(setSocket(socketio));
 
-      socketio.on('getOnlineUser' , (onlineUser) => {
+      socketio.on('getOnlineUsers' , (onlineUser) => {
         dispatch(setOnlineUsers(onlineUser));
       })
 
@@ -71,8 +72,8 @@ export default function App() {
         dispatch(setSocket(null));
       }
 
-    }else{
-      socketio.close();
+    }else if( socket){
+      socket.close();
       dispatch(setSocket(null));
     }
 

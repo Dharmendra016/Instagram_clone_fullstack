@@ -1,5 +1,6 @@
 import { conversation } from "../models/conversation.model.js";
 import {message} from "../models/message.model.js"
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const sendMessage = async (req, res) => {
 
@@ -8,15 +9,15 @@ export const sendMessage = async (req, res) => {
         const senderId = req.id; 
         const receiverId = req.params.id;
 
-        const {message} = req.body ;
+        const {Message} = req.body ;
 
         let Conversation = await conversation.findOne({
             participants:{$all:[senderId , receiverId]}
         })
 
         //establish the conversation if not started yet
-        if( !conversation ){
-            conversation = await conversation.create({
+        if( !Conversation ){
+            Conversation = await conversation.create({
                 participants:[senderId,receiverId]
             })
         };
@@ -24,10 +25,10 @@ export const sendMessage = async (req, res) => {
         const newMessage = await message.create({
             senderId,
             receiverId, 
-            message
+            message:Message
         })
 
-        if(newMessage) conversation.messages.push(newMessage._id);
+        if(newMessage) Conversation.messages.push(newMessage._id);
 
         // await Conversation.save();
         // await newMessage.save();
@@ -36,6 +37,12 @@ export const sendMessage = async (req, res) => {
         await Promise.all([Conversation.save() , newMessage.save()]);
 
         //implement socket.io for real time data transfter 
+
+        const receiverSocketId = getReceiverSocketId(receiverId);
+
+        if( receiverSocketId){
+            io.to(receiverSocketId).emit('newMessage',newMessage);
+        }
 
         return res.status(200).json({
             success:true, 
