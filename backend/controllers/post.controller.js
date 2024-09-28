@@ -3,7 +3,7 @@ import { user} from "../models/user.model.js";
 import {comment} from "../models/comment.model.js"
 import sharp from "sharp"
 import cloudinary from "cloudinary"
-import { getReceiverSocketId } from "../socket/socket.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const addNewPost = async (req , res) => {
     try {
@@ -127,7 +127,7 @@ export const likePost = async (req, res) => {
 
         const User = await user.findById(liker).select('username profilePic');
 
-        const postOwnerId = post.author.toString();
+        const postOwnerId = Post.author.toString();
 
         if( postOwnerId !== liker ){
             const notification = {
@@ -172,14 +172,14 @@ export const disLikePost = async (req, res) => {
         await Post.save(); 
 
         //implement socket io for real time notification 
-        const User = await user.findById(liker).select('username profilePic');
+        const User = await user.findById(disLiker).select('username profilePic');
 
-        const postOwnerId = post.author.toString();
+        const postOwnerId = Post.author.toString();
 
-        if( postOwnerId !== liker ){
+        if( postOwnerId !== disLiker ){
             const notification = {
                 type:"dislike",
-                userId:liker,
+                userId:disLiker,
                 userDetails:User,
                 postId,
                 message:'Your post was disliked'

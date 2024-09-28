@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSocket } from "./redux/socketSlice";
 import { setOnlineUsers } from "./redux/chatSlice";
+import { setLikeNotification } from "./redux/rtnSlice";
 
 const browserRouter = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ export default function App() {
 
       socketio.on('getOnlineUsers' , (onlineUser) => {
         dispatch(setOnlineUsers(onlineUser));
+      })
+
+      socketio.on('notification',(notification)=>{
+        dispatch(setLikeNotification(notification));
       })
 
       return () => {

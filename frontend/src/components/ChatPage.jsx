@@ -9,16 +9,15 @@ import { Input } from './ui/input';
 import Messages from './Messages';
 import axios from 'axios';
 import { setMessages } from '@/redux/chatSlice';
-import { toast } from 'sonner';
 
 const ChatPage = () => {
+
     const { user, suggestedUser, selectedUser } = useSelector(store => store.auth);
-    const {onlineUsers} = useSelector(store => store.chat);
+    const {onlineUsers , messages} = useSelector(store => store.chat);
     const dispatch = useDispatch();
     const [selected, setSelected] = useState(false);
-
     const [textMessage, setTextMessage] = useState("");
-    const {messages} = useSelector(store => store.chat);
+
     const chatUserHandler = async (selectedUser) => {
         try {
             dispatch(setSelectedUser(selectedUser));
@@ -38,16 +37,14 @@ const ChatPage = () => {
                 },
                 withCredentials:true,
             })
-
             if( res.data.success){
                 console.log(res.data);
                 dispatch(setMessages([...messages , res.data.newMessage]))
-
+                setTextMessage("");
             }
 
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
         }
     }
 
@@ -60,7 +57,7 @@ const ChatPage = () => {
 
     return (
         <div className='flex ml-[16%]  h-screen'>
-            <section className='border-r'>
+            <section className='border-r w-1/2'>
                 <h1 className='font-bold mb-4 px-3 text-xl '>{user?.username}</h1>
                 <hr className='mb-4 border-gray-300' />
 
@@ -92,7 +89,7 @@ const ChatPage = () => {
                         <section className='flex-1 flex flex-col'>
                             <div className='flex-col flex gap-2 z-10 bg-gray-50 pb-5 sticky border-b top-0'>
                                 <div className='flex gap-2 mt-8 ml-5'>
-                                    <Link to={`/profile/${selectedUser._id}`}>
+                                    <Link to={`/profile/${selectedUser?._id}`}>
                                         <Avatar className='h-10 w-10 rounded-full'>
                                             <AvatarImage src={selectedUser?.profilePic} className='h-10 w-10 rounded-full object-cover ' alt="post_image" />
                                             <AvatarFallback>CN</AvatarFallback>
@@ -113,7 +110,7 @@ const ChatPage = () => {
                                         <h1 className='text-2xl text-bold text-center mt-8'>{selectedUser?.username}</h1>
                                         <span className='text-sm font-thin text-gray-600'>{selectedUser?.bio || "bio here..."}</span>
                                     </div>
-                                    <Link to={`/profile/${selectedUser._id}`}>
+                                    <Link to={`/profile/${selectedUser?._id}`}>
                                         <Button variant="secondary" >View profile</Button>
                                     </Link>
                                 </div>
@@ -121,7 +118,7 @@ const ChatPage = () => {
                             </div>
                             <div className='flex items-center gap-3 p-4 border-t border-t-gray-200'>
                                 <Input value={textMessage} onChange={(e) => {setTextMessage(e.target.value)}} type="text" className="focus-visible:ring-transparent " placeholder="write message" />
-                                <Button onClick={() => {sendMessageHandler(selectedUser._id)}}>Send</Button>
+                                <Button onClick={() => {sendMessageHandler(selectedUser?._id)}}>Send</Button>
                             </div>
                         </section>
                     )

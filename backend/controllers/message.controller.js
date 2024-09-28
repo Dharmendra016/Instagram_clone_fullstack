@@ -6,7 +6,7 @@ export const sendMessage = async (req, res) => {
 
     try {
         
-        const senderId = req.id; 
+        const senderId = req.userId; 
         const receiverId = req.params.id;
 
         const {Message} = req.body ;
@@ -60,13 +60,13 @@ export const getMessage = async (req, res) => {
 
     try {
 
-        const senderId = req.id; 
+        const senderId = req.userId; 
         const receiverId = req.params.id; 
 
 
-        const Conversation = await conversation.find({
+        const Conversation = await conversation.findOne({
             participants:{$all:[senderId,receiverId]}
-        })
+        }).populate('messages')
 
         if(!conversation) return res.status(200).json({success:false,message:[]})
 
