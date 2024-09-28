@@ -7,11 +7,11 @@ import { AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { AtSign, Heart, MessageCircle } from 'lucide-react';
+import axios from 'axios';
 
 export const Profile = () => {
   const params = useParams();
   const userId = params.id;
-  console.log(userId);
   useGetUserProfile(userId);
 
   const [activeTab , setActiveTab] = useState("posts"); 
@@ -25,8 +25,24 @@ export const Profile = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   }
-
   const displayedPost = activeTab === "posts"? userProfile?.posts : userProfile?.bookmark;
+
+  const followUnfollowHandler = async ()=> {
+    try {
+
+      console.log(userProfile?._id);
+      const res =await axios.get(`http://localhost:8000/api/v1/user/followorunfollow/${userProfile?._id}`,{withCredentials:true});
+      
+      console.log(res.data);
+      if( res.data.success) {
+        toast.success(res.data.message);
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
 
   return (
     <div className='flex min-w-4xl justify-center mx-auto pl-10'>
@@ -55,7 +71,7 @@ export const Profile = () => {
                     isFollowing ? (<>
                       <Button variant="secondary" className="h-8">Unfollow</Button>
                       <Button variant="secondary" className="h-8">Message</Button></>) :
-                      (<Button className="bg-[#0095f8] hover:bg-[#30acff] h-8">Follow</Button>)
+                      (<Button onClick={followUnfollowHandler} className="bg-[#0095f8] hover:bg-[#30acff] h-8">Follow</Button>)
                   )
                 }
               </div>

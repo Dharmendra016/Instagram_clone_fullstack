@@ -239,6 +239,26 @@ export const addCommnet = async(req,res) => {
         Post.comments.push(Comment._id);
         await Post.save();
 
+        //real time notification 
+
+        // const User = await user.findById(authorId).select('username profilePic');
+
+        // const postOwnerId = Post.author.toString();
+
+        // if( postOwnerId !== authorId ){
+        //     const notification = {
+        //         type:"comment",
+        //         userId:authorId,
+        //         userDetails:User,
+        //         postId,
+        //         message:'Your post get comment'
+        //     }
+            
+        //     const postOwnerSocketId = getReceiverSocketId(postOwnerId)
+        //     io.to(postOwnerSocketId).emit('commentNotification',notification);
+        // }
+
+
         return res.status(200).json({
             success:true,
             comment:Comment,
@@ -338,14 +358,14 @@ export const bookmarkPost = async (req, res) => {
 
         if( User.bookmark.includes(postId)){
             //already in the bookmark --> remove it 
-            await User.updateOne({$pull:{bookmark:post._id}});
+            await User.updateOne({$pull:{bookmark:postId}});
             await User.save();
             return res.status(200).json({
                 message:'Unbookmark',
                 success:true,
             })
         }else{
-            await User.updatOne({$addToSet:{bookmark:post._id}});
+            await User.updateOne({$addToSet:{bookmark:postId}});
             await User.save();
             return res.status(200).json({
                 message:'bookmarked',

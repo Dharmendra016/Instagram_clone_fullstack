@@ -82,12 +82,12 @@ const LeftSideBar = () => {
                                 item.text === 'Notification' && likeNotification.length > 0 && (
                                     <Popover>
                                         <PopoverTrigger asChild> 
-                                            <Button size='icon' className="rounded-full h-5 w-5 absolute bottom-6 left-6">{likeNotification.length}</Button>
+                                            <Button size='icon' className="rounded-full h-5 w-5 absolute bottom-6 left-6 bg-red-600 hover:bg-red-600">{likeNotification.length}</Button>
                                         </PopoverTrigger>
                                         <PopoverContent>
                                             <div>
                                                 {
-                                                    likeNotification.length === 0 ? (<p>No new notification</p>):likeNotification.map((notification)=>{
+                                                    likeNotification?.length === 0 ? (<p>No new notification</p>):likeNotification.map((notification)=>{
                                                         return (
                                                             <div key={notification.userId} className='flex items-center gap-2 my-2'>
                                                                 <Avatar className='h-10 w-10 rounded-full'>
