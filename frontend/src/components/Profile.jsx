@@ -1,13 +1,15 @@
 import useGetUserProfile from '@/hooks/useGetUserProfile';
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { AtSign, Heart, MessageCircle } from 'lucide-react';
 import axios from 'axios';
+import { toast } from 'sonner';
+import { setAuthUser, setUserProfile } from '@/redux/authSlice';
 
 export const Profile = () => {
   const params = useParams();
@@ -21,11 +23,22 @@ export const Profile = () => {
   const isLoggedInUserProfile =  user?._id === userProfile?._id ? true : false;
   ;
 
-  const isFollowing = user.following.some(followedUser => followedUser._id === userProfile._id);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  // Update isFollowing state whenever user or userProfile changes
+  useEffect(() => {
+    if (user && userProfile) {
+      setIsFollowing(user?.following.includes(userProfile?._id));
+    }
+  }, [user, userProfile]);
+
+  console.log(isFollowing);
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   }
   const displayedPost = activeTab === "posts"? userProfile?.posts : userProfile?.bookmark;
+
+  const dispatch = useDispatch();
 
   const followUnfollowHandler = async ()=> {
     try {
@@ -33,8 +46,25 @@ export const Profile = () => {
       console.log(userProfile?._id);
       const res =await axios.get(`http://localhost:8000/api/v1/user/followorunfollow/${userProfile?._id}`,{withCredentials:true});
       
-      console.log(res.data);
       if( res.data.success) {
+
+        const alreadyFollowing = user?.following.includes(userProfile?._id);
+        if(alreadyFollowing){
+          setIsFollowing(false);
+        }else{
+          setIsFollowing(true);
+        }
+        const updatedUser = {
+          ...user , 
+          following : alreadyFollowing ? user.following?.filter(id=> id !== userProfile?._id) : [...user.following , userProfile?._id]  
+        }
+        dispatch(setAuthUser(updatedUser));
+        const updatedUserProfile = {
+          ...userProfile , 
+          followers : alreadyFollowing ? userProfile.followers?.filter(id=> id !== user?._id) : [...userProfile.followers , user?._id]  
+        }
+        
+        dispatch(setUserProfile(updatedUserProfile));
         toast.success(res.data.message);
       }
 
@@ -69,7 +99,7 @@ export const Profile = () => {
                     <Button variant="secondary" className="hover:bg-gray-200 h-8">Ad tools</Button>
                   </div>) : (
                     isFollowing ? (<>
-                      <Button variant="secondary" className="h-8">Unfollow</Button>
+                      <Button variant="secondary" onClick={followUnfollowHandler} className="h-8">Unfollow</Button>
                       <Button variant="secondary" className="h-8">Message</Button></>) :
                       (<Button onClick={followUnfollowHandler} className="bg-[#0095f8] hover:bg-[#30acff] h-8">Follow</Button>)
                   )

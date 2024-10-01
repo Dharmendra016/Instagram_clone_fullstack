@@ -230,30 +230,27 @@ export const followOrUnfollow = async ( req, res ) => {
 
         const isFollowing = User.following.includes(follower) ; 
 
-        if( isFollowing ){
-
-            //unfollow logic 
+        if (isFollowing) {
+            // unfollow logic
             await Promise.all([
-                user.updateOne({_id:following} , {$pull:{following:follower}}),
-                user.updateOne({_id:follower} , {$pull:{follower:following}}) , 
-            ])
+                user.findByIdAndUpdate(following, { $pull: { following: follower } }),
+                user.findByIdAndUpdate(follower, { $pull: { followers: following } }),
+            ]);
             return res.status(200).json({
-                message:"Unfollowed successfully",
-                success:true,
-            })
-        }else{
-            //yakai choti 2 db call hunxa vana .  use promise.all([])
+                message: "Unfollowed successfully",
+                success: true,
+            });
+        } else {
+            // follow logic
             await Promise.all([
-                user.updateOne({_id:following} , {$push:{following:follower}}),
-                user.updateOne({_id:follower} , {$push:{followers:following}}) , 
-            ])
+                user.findByIdAndUpdate(following, { $push: { following: follower } }),
+                user.findByIdAndUpdate(follower, { $push: { followers: following } }),
+            ]);
             return res.status(200).json({
-                message:"followed successfully",
-                success:true,
-            })
+                message: "Followed successfully",
+                success: true,
+            });
         }
-       
-
     } catch (error) {
         console.log(error.message);
     }
