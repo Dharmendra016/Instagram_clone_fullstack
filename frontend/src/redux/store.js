@@ -3,7 +3,7 @@ import authSlice from './authSlice';
 import  postSlice from './postSlice';
 import socketSlice from "./socketSlice";
 import chatSlice from "./chatSlice";
-import rtnSlice from "./rtnSlice";
+import rtnSlice from "./rtnSlice"
 
 import {
     persistReducer,

@@ -79,7 +79,7 @@ const LeftSideBar = () => {
                             {item.text}
 
                             {
-                                item.text === 'Notification' && likeNotification.length > 0 && (
+                                item.text === 'Notification' && likeNotification?.length > 0 && (
                                     <Popover>
                                         <PopoverTrigger asChild> 
                                             <Button size='icon' className="rounded-full h-5 w-5 absolute bottom-6 left-6 bg-red-600 hover:bg-red-600">{likeNotification.length}</Button>
