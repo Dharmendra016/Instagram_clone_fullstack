@@ -84,7 +84,7 @@ const Login = () => {
             <div>
                 <Label className="py-2 font-medium">Password</Label>
                 <Input
-                type="text"
+                type="password"
                 name='password'
                 value={input.password}
                 onChange={changeEventHandler}
