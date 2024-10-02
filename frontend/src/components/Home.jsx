@@ -7,11 +7,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { clearPosts } from '@/redux/postSlice'
 import useGetSuggestedUser from '@/hooks/useGetSuggestedUser'
 import useGetUserProfile from '@/hooks/useGetUserProfile'
+// import { clearNotification } from '@/redux/rtnSlice'
 
 const Home = () => {
   const dispatch = useDispatch();
   dispatch(clearPosts())
   useGetSuggestedUser();
+  // dispatch(clearNotification())
   useGetAllPost();
   const {user} = useSelector(store => store.auth);
   useGetUserProfile(user?._id);

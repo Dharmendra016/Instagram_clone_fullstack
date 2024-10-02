@@ -13,7 +13,7 @@ const io = new Server(httpServer, {
 });
 
 
-const userSocketMap = { }//this map stores socket id corresponding the user io; userId -> socketId 
+const userSocketMap = {}//this map stores socket id corresponding the user io; userId -> socketId 
 
 export const getReceiverSocketId = (receiverId) => userSocketMap[receiverId];
 
@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
     }
 
     io.emit('getOnlineUsers', Object.keys(userSocketMap));
-
+    
 
     socket.on("disconnect", () => {
         if (userId) {
@@ -39,4 +39,4 @@ io.on("connection", (socket) => {
 
 });
 
-export {app , httpServer , io};
+export { app, httpServer, io };

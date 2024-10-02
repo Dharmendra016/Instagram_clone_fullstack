@@ -16,12 +16,11 @@ export const Profile = () => {
   const userId = params.id;
   useGetUserProfile(userId);
 
-  const [activeTab , setActiveTab] = useState("posts"); 
-  const { userProfile , user} = useSelector(store => store.auth);
+  const [activeTab, setActiveTab] = useState("posts");
+  const { userProfile, user } = useSelector(store => store.auth);
 
 
-  const isLoggedInUserProfile =  user?._id === userProfile?._id ? true : false;
-  ;
+  const isLoggedInUserProfile = user?._id === userProfile?._id ? true : false;
 
   const [isFollowing, setIsFollowing] = useState(false);
 
@@ -32,38 +31,32 @@ export const Profile = () => {
     }
   }, [user, userProfile]);
 
-  console.log(isFollowing);
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   }
-  const displayedPost = activeTab === "posts"? userProfile?.posts : userProfile?.bookmark;
+  const displayedPost = activeTab === "posts" ? userProfile?.posts : userProfile?.bookmark;
 
   const dispatch = useDispatch();
-
-  const followUnfollowHandler = async ()=> {
+  const followUnfollowHandler = async () => {
     try {
+      const res = await axios.get(`http://localhost:8000/api/v1/user/followorunfollow/${userProfile?._id}`, { withCredentials: true });
 
-      console.log(userProfile?._id);
-      const res =await axios.get(`http://localhost:8000/api/v1/user/followorunfollow/${userProfile?._id}`,{withCredentials:true});
-      
-      if( res.data.success) {
-
+      if (res.data.success) {
         const alreadyFollowing = user?.following.includes(userProfile?._id);
-        if(alreadyFollowing){
+        if (alreadyFollowing) {
           setIsFollowing(false);
-        }else{
+        } else {
           setIsFollowing(true);
         }
         const updatedUser = {
-          ...user , 
-          following : alreadyFollowing ? user.following?.filter(id=> id !== userProfile?._id) : [...user.following , userProfile?._id]  
+          ...user,
+          following: alreadyFollowing ? user.following?.filter(id => id !== userProfile?._id) : [...user.following, userProfile?._id]
         }
         dispatch(setAuthUser(updatedUser));
         const updatedUserProfile = {
-          ...userProfile , 
-          followers : alreadyFollowing ? userProfile.followers?.filter(id=> id !== user?._id) : [...userProfile.followers , user?._id]  
+          ...userProfile,
+          followers: alreadyFollowing ? userProfile.followers?.filter(id => id !== user?._id) : [...userProfile.followers, user?._id]
         }
-        
         dispatch(setUserProfile(updatedUserProfile));
         toast.success(res.data.message);
       }
@@ -100,7 +93,11 @@ export const Profile = () => {
                   </div>) : (
                     isFollowing ? (<>
                       <Button variant="secondary" onClick={followUnfollowHandler} className="h-8">Unfollow</Button>
-                      <Button variant="secondary" className="h-8">Message</Button></>) :
+                      <Link to='/chat'>
+                        <Button variant="secondary" className="h-8"  >Message</Button>
+                      </Link>
+                    </>
+                    ) :
                       (<Button onClick={followUnfollowHandler} className="bg-[#0095f8] hover:bg-[#30acff] h-8">Follow</Button>)
                   )
                 }
@@ -108,13 +105,13 @@ export const Profile = () => {
               <div>
                 <div className='flex gap-4 items-center'>
                   <p>
-                    <span className='font-semibold mr-2'>{userProfile?.posts.length}</span>posts
+                    <span className='font-semibold mr-2'>{userProfile?.posts?.length}</span>posts
                   </p>
                   <p>
-                    <span className='font-semibold mr-2'>{userProfile?.followers.length}</span>followers
+                    <span className='font-semibold mr-2'>{userProfile?.followers?.length}</span>followers
                   </p>
                   <p>
-                    <span className='font-semibold mr-2 '>{userProfile?.following.length}</span>following
+                    <span className='font-semibold mr-2 '>{userProfile?.following?.length}</span>following
                   </p>
                 </div>
                 <div className='flex flex-col'>
@@ -128,8 +125,8 @@ export const Profile = () => {
         </div>
         <div className='border-t w-[70%] mx-auto border-t-gray-200'>
           <div className='flex items-center justify-center gap-10 text-sm'>
-            <span className={`py-3 cursor-pointer ${activeTab === 'posts' ? 'font-bold':''} `} onClick={() => {handleTabChange("posts")}}>POSTS</span>
-            <span className={`py-3 cursor-pointer ${activeTab === 'saved' ? 'font-bold':''}`} onClick={() => {handleTabChange("saved")}}>SAVED</span>
+            <span className={`py-3 cursor-pointer ${activeTab === 'posts' ? 'font-bold' : ''} `} onClick={() => { handleTabChange("posts") }}>POSTS</span>
+            <span className={`py-3 cursor-pointer ${activeTab === 'saved' ? 'font-bold' : ''}`} onClick={() => { handleTabChange("saved") }}>SAVED</span>
             <span className='py-3 cursor-pointer'>REELS</span>
             <span className='py-3 cursor-pointer'>TAGS</span>
           </div>
@@ -137,11 +134,11 @@ export const Profile = () => {
             {
               displayedPost?.map((post) => {
                 return <div key={post?._id} className=' relative group cursor-pointer'>
-                  <img src={post.image} alt="img" className='rounded-sm my-2 w-full aspect-square object-cover'/>
+                  <img src={post.image} alt="img" className='rounded-sm my-2 w-full aspect-square object-cover' />
                   <div className='absolute inset-0 flex items-center justify-center opacity-0 bg-black bg-opacity-50 group-hover:opacity-100 transition-opacity duration-300'>
                     <div className='flex items-center gap-2 hover:text-gray-300 text-white space-x-4'>
-                      <Heart/>{post?.likes.length}
-                      <MessageCircle/>{post?.comments.length}
+                      <Heart />{post?.likes?.length}
+                      <MessageCircle />{post?.comments?.length}
 
                     </div>
                   </div>

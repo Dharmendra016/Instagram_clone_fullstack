@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import axios from 'axios'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import { Badge } from './ui/badge'
+import { setAuthUser, setUserProfile } from '@/redux/authSlice'
 
 const Post = ({ post }) => {
     const [text, setText] = useState("");
@@ -55,7 +56,7 @@ const Post = ({ post }) => {
         try {
             const action = liked ? 'dislike' : 'like';
             const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/${action}`, { withCredentials: true });
-            console.log(res.data);
+            
             if (res.data.success) {
                 const updatedLikes = liked ? postLike - 1 : postLike + 1;
                 setPostLike(updatedLikes);
@@ -108,11 +109,40 @@ const Post = ({ post }) => {
     const bookmarkHandler = async () => {
 
         try {
-            
-            const res = await axios.get(`http://localhost:8000/api/v1/post/${post?._id}/bookmark` , {withCredentials:true})
 
-            if( res.data.success){
-              toast.success(res.data.message);
+            const res = await axios.get(`http://localhost:8000/api/v1/post/${post?._id}/bookmark`, { withCredentials: true })
+
+            if (res.data.success) {
+                toast.success(res.data.message);
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+    const followUnfollowHandler = async (userProfile) => {
+        try {
+
+            console.log(userProfile?._id);
+            const res = await axios.get(`http://localhost:8000/api/v1/user/followorunfollow/${userProfile?._id}`, { withCredentials: true });
+
+
+            if (res.data.success) {
+                const alreadyFollowing = user?.following.includes(userProfile?._id);
+                const updatedUser = {
+                    ...user,
+                    following: alreadyFollowing ? user.following?.filter(id => id !== userProfile?._id) : [...user.following, userProfile?._id]
+                }
+                dispatch(setAuthUser(updatedUser));
+                const updatedUserProfile = {
+                    ...userProfile,
+                    followers: alreadyFollowing ? userProfile.followers?.filter(id => id !== user?._id) : [...userProfile.followers, user?._id]
+                }
+
+                dispatch(setUserProfile(updatedUserProfile));
+                toast.success(res.data.message);
             }
 
         } catch (error) {
@@ -129,10 +159,10 @@ const Post = ({ post }) => {
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <div className='flex gap-3'>
-                    <h1 className='text-sm font-thin'>{post.author?.username}</h1>
-                    {
-                        post.author._id === user._id && <Badge variant="secondary" className="font-semibold">Author</Badge>
-                    }
+                        <h1 className='text-sm font-thin'>{post.author?.username}</h1>
+                        {
+                            post.author._id === user._id && <Badge variant="secondary" className="font-semibold">Author</Badge>
+                        }
                     </div>
                 </div>
                 <Dialog>
@@ -141,7 +171,11 @@ const Post = ({ post }) => {
                     </DialogTrigger>
                     <DialogContent className="flex flex-col justify-center items-center">
                         {
-                            user && user?._id !== post.author._id && <Button variant="ghost" className="cursor-pointer w-fit text-[#ED4956] font-bold">Unfollow</Button>
+                            user && user?._id !== post.author._id && <Button variant='secondary' onClick={() => {followUnfollowHandler(post.author)}} className={`cursor-pointer w-fit font-bold ${user.following?.includes(post.author?._id) ? "text-[#ED4956]" : "text-[#4adbff]"}`}>
+                                {
+                                    user.following?.includes(post.author?._id) ? "unfollow" : "follow"
+                                }
+                            </Button>
                         }
                         <Button variant="ghost" className="cursor-pointer w-fit ">Add to favorites</Button>
 
@@ -172,7 +206,7 @@ const Post = ({ post }) => {
 
                     <Send className='cursor-pointer hover:text-gray-600' />
                 </div>
-            <Bookmark onClick={bookmarkHandler} className={`ursor-pointer hover:text-gray-600 `}/>
+                <Bookmark onClick={bookmarkHandler} className={`ursor-pointer hover:text-gray-600 `} />
             </div>
             <span className='font-medium block mb-2'>{postLike} likes</span>
             <p >

@@ -22,7 +22,7 @@ const LeftSideBar = () => {
             if( res.data.success ){
                 dispatch(setAuthUser(null));
                 dispatch(setPosts([]))
-                dispatch(setSelectedPost(null));
+                dispatch(setSelectedPost(null))
                 navigate("/login");
                 toast.success(res.data.message);
             }
@@ -79,7 +79,7 @@ const LeftSideBar = () => {
                             {item.text}
 
                             {
-                                item.text === 'Notification' && likeNotification.length > 0 && (
+                                item.text === 'Notification' && likeNotification?.length > 0 && (
                                     <Popover>
                                         <PopoverTrigger asChild> 
                                             <Button size='icon' className="rounded-full h-5 w-5 absolute bottom-6 left-6 bg-red-600 hover:bg-red-600">{likeNotification.length}</Button>
@@ -89,12 +89,12 @@ const LeftSideBar = () => {
                                                 {
                                                     likeNotification?.length === 0 ? (<p>No new notification</p>):likeNotification.map((notification)=>{
                                                         return (
-                                                            <div key={notification.userId} className='flex items-center gap-2 my-2'>
+                                                            <div key={notification?.userId} className='flex items-center gap-2 my-2'>
                                                                 <Avatar className='h-10 w-10 rounded-full'>
                                                                     <AvatarImage src={notification.userDetails?.profilePic} className='w-7 h-7 rounded-full'/>
                                                                     <AvatarFallback>CN</AvatarFallback>
                                                                 </Avatar>
-                                                                <p className='text-sm'> <span  className='font-bold mr-2'>{notification.userDetails?.username}</span>liked your post</p>
+                                                                <p className='text-sm'> <span  className='font-bold mr-2'>{notification?.userDetails?.username}</span>liked your post</p>
                                                             </div>
                                                         )
                                                     })
