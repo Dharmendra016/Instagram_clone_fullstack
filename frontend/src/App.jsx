@@ -9,18 +9,18 @@ import {
 import { Profile } from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import ChatPage from "./components/ChatPage";
-// import ChatWithUser from "./components/ChatWithUser";
 import {io} from "socket.io-client"
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSocket } from "./redux/socketSlice";
 import { setOnlineUsers } from "./redux/chatSlice";
 import { setLikeNotification } from "./redux/rtnSlice";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const browserRouter = createBrowserRouter([
   {
     path:"/",
-    element:<MainLayout/>,
+    element: <ProtectedRoutes><MainLayout/></ProtectedRoutes> ,
     children:[
       {
         path:"/",
@@ -86,8 +86,8 @@ export default function App() {
   },[user, dispatch]);
 
   return (
-    <div>
+    <>
       <RouterProvider router={browserRouter}/>
-    </div>
+    </>
   )
 }

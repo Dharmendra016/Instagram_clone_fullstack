@@ -1,11 +1,12 @@
 import { Label } from './ui/label'
 import {Input} from "./ui/input"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
+import { useSelector } from 'react-redux'
 
 const Signup = () => {
 
@@ -21,6 +22,8 @@ const Signup = () => {
     }
 
     const navigate = useNavigate();
+    const {user} = useSelector(store => store.auth);
+
     const signupHandeler = async (e) => {
         e.preventDefault();
         try {
@@ -51,6 +54,13 @@ const Signup = () => {
             setLoading(false);
         }
     }
+
+    useEffect(() =>{
+        if(user){
+            navigate("/");
+        }
+    },[])
+
 
   return (
     <div className='flex items-center w-screen h-screen justify-center'>
