@@ -17,7 +17,7 @@ const SuggestedUser = () => {
         try {
     
           console.log(userProfile?._id);
-          const res =await axios.get(`http://localhost:8000/api/v1/user/followorunfollow/${userProfile?._id}`,{withCredentials:true});
+          const res =await axios.get(`https://instagram-clone-fullstack-ey08.onrender.com/api/v1/user/followorunfollow/${userProfile?._id}`,{withCredentials:true});
             
           console.log(res.data);
           if( res.data.success) {

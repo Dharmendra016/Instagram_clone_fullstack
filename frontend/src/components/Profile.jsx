@@ -39,7 +39,7 @@ export const Profile = () => {
   const dispatch = useDispatch();
   const followUnfollowHandler = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/v1/user/followorunfollow/${userProfile?._id}`, { withCredentials: true });
+      const res = await axios.get(`https://instagram-clone-fullstack-ey08.onrender.com/api/v1/user/followorunfollow/${userProfile?._id}`, { withCredentials: true });
 
       if (res.data.success) {
         const alreadyFollowing = user?.following.includes(userProfile?._id);
